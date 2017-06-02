@@ -8,7 +8,7 @@
 # Calculate number of lines, read file into array
 FSIZE=$(wc -l langlearn.dat | sed '/^$/d' | awk '{ print $1 }')
 IFS=$'\r\n' GLOBIGNORE='*' command eval  'DBARR=($(cat langlearn.dat | sed '/^$/d'))'
-echo "db size: $FSIZE"
+echo -e "\ndb size: $FSIZE"
 echo "ctrl-c to exit"
 
 # Set some vars
