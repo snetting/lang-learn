@@ -21,8 +21,8 @@ function juggle {
 	RLINE=$(( RANDOM % $FSIZE ))
 	RDATA=${DBARR[$RLINE]}
         RSWAP=$(( RANDOM % 2))
-        VARA=$(echo $RDATA | cut -d":" -f1)
-        VARB=$(echo $RDATA | cut -d":" -f2)
+        VARA=$(echo $RDATA | cut -d":" -f1 | tr '[:upper:]' '[:lower:]')
+        VARB=$(echo $RDATA | cut -d":" -f2 | tr '[:upper:]' '[:lower:]')
         if [ $RSWAP -eq 1 ]; then
                 VARC=$VARA; VARA=$VARB; VARB=$VARC
         fi
@@ -43,8 +43,9 @@ trap control_c SIGINT
 # on incorrect answer ask user to type both words (memory aid, not checked)
 while true; do
 	juggle
-	echo -en "\n---\nTranslate: $VARA ? ";
-	read INPUT
+	echo -en "\n---\nTranslate $VARA : ";
+	read RAWINPUT
+	INPUT=$(echo $RAWINPUT | tr '[:upper:]' '[:lower:]')
 	#echo "read: $INPUT, is $INPUT = $VARB ?"
 	if [ "$INPUT" = "$VARB" ]; then
 		echo "Correct!"
