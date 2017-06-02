@@ -39,6 +39,8 @@ function control_c {
 
 trap control_c SIGINT
 
+# loop and question
+# on incorrect answer ask user to type both words (memory aid, not checked)
 while true; do
 	juggle
 	echo -en "\n---\nTranslate: $VARA ? ";
