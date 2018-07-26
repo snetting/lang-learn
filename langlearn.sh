@@ -4,12 +4,24 @@
 # language data file is colon separated values intended as simple
 # word:word translation pairs.  The script will select random pairs plus
 # randomly swap the translation direction.
+#
+# Use: langlearn.sh <datafile> <limit>
+#      (where limit uses only top x lines of file)
+
+DATAFILE=$1
+LIMIT=$2
 
 # Calculate number of lines, read file into array
-FSIZE=$(wc -l langlearn.dat | sed '/^$/d' | awk '{ print $1 }')
-IFS=$'\r\n' GLOBIGNORE='*' command eval  'DBARR=($(cat langlearn.dat | sed '/^$/d'))'
-echo -e "\ndb size: $FSIZE"
-echo "ctrl-c to exit"
+FSIZE=$(wc -l $DATAFILE | sed '/^$/d' | awk '{ print $1 }')
+IFS=$'\r\n' GLOBIGNORE='*' command eval  'DBARR=($(cat $DATAFILE | sed '/^$/d'))'
+echo -ne "\ndb size: $FSIZE" 
+if [ ! -z "$LIMIT" ]; then echo -n " (limit $LIMIT)"; fi
+echo -e "\nctrl-c to exit"
+
+# Impose limit if set (for 'top 100 words' - required ordered word list)
+if [ $LIMIT -lt $FSIZE ]; then 
+  FSIZE=$LIMIT 
+fi
 
 # Set some vars
 POINTS=0  # correct answers
