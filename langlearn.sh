@@ -64,7 +64,7 @@ while true; do
 		POINTS=$(expr $POINTS + 1)
 	else
 		echo "Wrong - correct answer is $VARB"
-		echo -n "Type: $VARA is $VARB: "
+		echo -n "Type both words: $VARA $VARB: "
 		read INPUT
 	fi
 	TOTAL=$(expr $TOTAL + 1)
