@@ -11,6 +11,11 @@
 DATAFILE=$1
 LIMIT=$2
 
+if [ -u $DATAFILE ]; then
+  echo -e "\nUse: langlearn.sh <datafile> <limit>\n     (where limit uses only top x lines of file)\n"
+  exit
+fi
+
 # Calculate number of lines, read file into array
 FSIZE=$(wc -l $DATAFILE | sed '/^$/d' | awk '{ print $1 }')
 IFS=$'\r\n' GLOBIGNORE='*' command eval  'DBARR=($(cat $DATAFILE | sed '/^$/d'))'
@@ -19,8 +24,10 @@ if [ ! -z "$LIMIT" ]; then echo -n " (limit $LIMIT)"; fi
 echo -e "\nctrl-c to exit"
 
 # Impose limit if set (for 'top 100 words' - required ordered word list)
-if [ $LIMIT -lt $FSIZE ]; then 
-  FSIZE=$LIMIT 
+if [ ! -z $LIMIT ]; then
+  if [ $LIMIT -lt $FSIZE ]; then 
+    FSIZE=$LIMIT 
+  fi
 fi
 
 # Set some vars
