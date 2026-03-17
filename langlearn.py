@@ -207,10 +207,13 @@ class LanguageLearnerGUI:
         self.btn_frame = ttk.Frame(self.main_frame)
         self.btn_frame.pack(pady=20)
         
-        self.submit_btn = ttk.Button(self.btn_frame, text="Submit", command=self.submit_answer)
+        # Set a min-width for buttons to avoid text truncation on some systems
+        self.style.configure("Action.TButton", font=("Helvetica", 12), width=15)
+        
+        self.submit_btn = ttk.Button(self.btn_frame, text="Submit (Enter)", command=self.submit_answer, style="Action.TButton")
         self.submit_btn.pack(side=tk.LEFT, padx=10)
         
-        self.next_btn = ttk.Button(self.btn_frame, text="Next", command=self.next_question, state=tk.DISABLED)
+        self.next_btn = ttk.Button(self.btn_frame, text="Next (Enter)", command=self.next_question, state=tk.DISABLED, style="Action.TButton")
         self.next_btn.pack(side=tk.LEFT, padx=10)
 
         # Global bindings
