@@ -49,7 +49,7 @@ The script expects a simple colon-separated text file:
 
 ```text
 me:mina
-you:sinua
+you:sina
 and:ja
 ```
 
