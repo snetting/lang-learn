@@ -207,8 +207,8 @@ class LanguageLearnerGUI:
         self.btn_frame = ttk.Frame(self.main_frame)
         self.btn_frame.pack(pady=20)
         
-        # Set a min-width for buttons to avoid text truncation on some systems
-        self.style.configure("Action.TButton", font=("Helvetica", 12), width=15)
+        # Set a min-width and padding for buttons to avoid text truncation
+        self.style.configure("Action.TButton", font=("Helvetica", 11), width=18, padding=10)
         
         self.submit_btn = ttk.Button(self.btn_frame, text="Submit (Enter)", command=self.submit_answer, style="Action.TButton")
         self.submit_btn.pack(side=tk.LEFT, padx=10)
