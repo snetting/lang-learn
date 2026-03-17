@@ -162,97 +162,105 @@ class LanguageLearnerGUI:
         self.learner = learner
         self.root = root
         self.root.title("Language Learner")
-        self.root.geometry("500x400")
+        self.root.geometry("600x450")
         
         self.style = ttk.Style()
         self.style.theme_use('clam')
+        self.style.configure("TLabel", font=("Helvetica", 12))
+        self.style.configure("Header.TLabel", font=("Helvetica", 14))
+        self.style.configure("Question.TLabel", font=("Helvetica", 28, "bold"))
+        self.style.configure("Feedback.TLabel", font=("Helvetica", 14, "italic"))
         
-        self.main_frame = ttk.Frame(root, padding="20")
+        self.main_frame = ttk.Frame(root, padding="30")
         self.main_frame.pack(fill=tk.BOTH, expand=True)
         
         # Header
-        self.header_label = ttk.Label(self.main_frame, text="Translate the word:", font=("Helvetica", 14))
-        self.header_label.pack(pady=10)
+        self.header_label = ttk.Label(self.main_frame, text="Translate the word:", style="Header.TLabel")
+        self.header_label.pack(pady=(0, 10))
         
         # Question
         self.question_var = tk.StringVar()
-        self.question_label = ttk.Label(self.main_frame, textvariable=self.question_var, font=("Helvetica", 24, "bold"), foreground="#333")
+        self.question_label = ttk.Label(self.main_frame, textvariable=self.question_var, style="Question.TLabel", foreground="#2c3e50")
         self.question_label.pack(pady=20)
         
         # Input
-        self.answer_entry = ttk.Entry(self.main_frame, font=("Helvetica", 16))
+        self.answer_entry = ttk.Entry(self.main_frame, font=("Helvetica", 18), justify='center')
         self.answer_entry.pack(pady=10, fill=tk.X)
-        self.answer_entry.bind('<Return>', self.submit_answer)
         self.answer_entry.focus()
         
         # Feedback
         self.feedback_var = tk.StringVar()
-        self.feedback_label = ttk.Label(self.main_frame, textvariable=self.feedback_var, font=("Helvetica", 12))
-        self.feedback_label.pack(pady=10)
+        self.feedback_label = ttk.Label(self.main_frame, textvariable=self.feedback_var, style="Feedback.TLabel")
+        self.feedback_label.pack(pady=15)
+        
+        # Adjustment Message
+        self.adjustment_var = tk.StringVar()
+        self.adjustment_label = ttk.Label(self.main_frame, textvariable=self.adjustment_var, font=("Helvetica", 10), foreground="#e67e22")
+        self.adjustment_label.pack(pady=5)
         
         # Stats
         self.stats_var = tk.StringVar()
-        self.stats_label = ttk.Label(self.main_frame, textvariable=self.stats_var, font=("Helvetica", 10), foreground="#666")
+        self.stats_label = ttk.Label(self.main_frame, textvariable=self.stats_var, font=("Helvetica", 11), foreground="#7f8c8d")
         self.stats_label.pack(side=tk.BOTTOM, pady=10)
         
         # Buttons
         self.btn_frame = ttk.Frame(self.main_frame)
-        self.btn_frame.pack(pady=10)
+        self.btn_frame.pack(pady=20)
         
         self.submit_btn = ttk.Button(self.btn_frame, text="Submit", command=self.submit_answer)
-        self.submit_btn.pack(side=tk.LEFT, padx=5)
+        self.submit_btn.pack(side=tk.LEFT, padx=10)
         
         self.next_btn = ttk.Button(self.btn_frame, text="Next", command=self.next_question, state=tk.DISABLED)
-        self.next_btn.pack(side=tk.LEFT, padx=5)
+        self.next_btn.pack(side=tk.LEFT, padx=10)
+
+        # Global bindings
+        self.root.bind('<Return>', self.handle_enter)
+        self.root.bind('<Escape>', lambda e: self.root.quit())
 
         self.next_question()
+
+    def handle_enter(self, event=None):
+        if self.next_btn['state'] == tk.NORMAL:
+            self.next_question()
+        else:
+            self.submit_answer()
 
     def next_question(self):
         self.learner.get_next_question()
         self.question_var.set(self.learner.current_question['question'])
-        self.answer_entry.delete(0, tk.END)
+        
         self.answer_entry.config(state=tk.NORMAL)
+        self.answer_entry.delete(0, tk.END)
         self.answer_entry.focus()
+        
         self.feedback_var.set("")
+        self.adjustment_var.set("")
         self.next_btn.config(state=tk.DISABLED)
         self.submit_btn.config(state=tk.NORMAL)
         self.update_stats()
 
     def submit_answer(self, event=None):
-        if self.next_btn['state'] == tk.NORMAL:
-            self.next_question()
+        user_input = self.answer_entry.get().strip()
+        if not user_input:
             return
 
-        user_input = self.answer_entry.get()
         is_correct, correct_answer, adjustment_msg = self.learner.check_answer(user_input)
         
         if adjustment_msg:
-             messagebox.showinfo("Progress Update", adjustment_msg)
+             self.adjustment_var.set(adjustment_msg)
 
         if is_correct:
-            self.feedback_var.set("Correct!")
-            self.feedback_label.config(foreground="green")
-            self.master_next() # Auto advance on correct? Maybe better UX to wait
-            # Actually, let's wait for user to press enter again or click next
-            # To make it fluid: Enter on correct -> Next. Enter on wrong -> Show answer -> Next.
-            self.answer_entry.config(state=tk.DISABLED)
-            self.submit_btn.config(state=tk.DISABLED)
-            self.next_btn.config(state=tk.NORMAL)
-            self.next_btn.focus()
+            self.feedback_var.set("✓ Correct!")
+            self.feedback_label.config(foreground="#27ae60")
         else:
-            self.feedback_var.set(f"Wrong! Correct: {correct_answer}")
-            self.feedback_label.config(foreground="red")
-            self.answer_entry.config(state=tk.DISABLED)
-            self.submit_btn.config(state=tk.DISABLED)
-            self.next_btn.config(state=tk.NORMAL)
-            self.next_btn.focus()
+            self.feedback_var.set(f"✗ Wrong! Correct: {correct_answer}")
+            self.feedback_label.config(foreground="#c0392b")
             
+        self.answer_entry.config(state=tk.DISABLED)
+        self.submit_btn.config(state=tk.DISABLED)
+        self.next_btn.config(state=tk.NORMAL)
+        self.next_btn.focus()
         self.update_stats()
-
-    def master_next(self):
-        # Helper to decide if we auto advance or not. 
-        # For now, let's just enable the next button logic.
-        pass
 
     def update_stats(self):
         stats = f"Score: {self.learner.points}/{self.learner.total} | Window: {self.learner.window_size}"
