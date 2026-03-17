@@ -245,8 +245,6 @@ class LanguageLearnerGUI:
 
     def submit_answer(self, event=None):
         user_input = self.answer_entry.get().strip()
-        if not user_input:
-            return
 
         is_correct, correct_answer, adjustment_msg = self.learner.check_answer(user_input)
         
